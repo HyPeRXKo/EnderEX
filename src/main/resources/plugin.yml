@@ -1,0 +1,37 @@
+name: EnderEX
+version: '${project.version}'
+main: fr.infinitystudios.enderex.EnderEX
+api-version: 1.19
+authors: [ InfinityStudios ]
+website: https://vlxproject.fr
+commands:
+  EnderEX:
+    description: main command
+    usage: /<command>
+    aliases: [ex, ec, enderchest]
+  EnderEXsee:
+    description: admin command
+    usage: /<command> {player}
+    aliases: [ecsee, exsee]
+permissions:
+  enderex.chest.1:
+    description: open 1 row
+    default: false
+  enderex.chest.2:
+    description: open 2 row
+    default: false
+  enderex.chest.3:
+    description: open 3 row
+    default: false
+  enderex.chest.4:
+    description: open 4 row
+    default: false
+  enderex.chest.5:
+    description: open 5 row
+    default: false
+  enderex.chest.6:
+    description: open 6 row
+    default: false
+  enderex.chest.admin:
+    description: admin perm
+    default: false
