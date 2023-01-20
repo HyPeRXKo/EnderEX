@@ -21,12 +21,14 @@ public class EnderEXSeeCommand implements TabExecutor {
             if (!p.hasPermission("enderex.chest.admin")) {
                 temp = "&7[&dEnderEX&7] &cYou do not have the permission to use this command.";
                 p.sendMessage(ChatColor.translateAlternateColorCodes('&', temp));
+                return true;
             }
-            if (p.hasPermission("enderex.chest.admin") && args.length != 1) {
+            else if ((p.hasPermission("enderex.chest.admin") || p.isOp()) && args.length != 1) {
                 temp = "&7[&dEnderEX&7] &cYou need to specify a player.";
                 p.sendMessage(ChatColor.translateAlternateColorCodes('&', temp));
+                return true;
             }
-            if (args.length == 1) {
+            else if ((p.hasPermission("enderex.chest.admin") || p.isOp()) && args.length == 1) {
                 Player arg = Bukkit.getPlayerExact(args[0]);
                 if (arg != null) {
                     Inventory chest = iu.GetChestInventoryAdmin(arg);
