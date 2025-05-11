@@ -1,6 +1,7 @@
 package fr.infinitystudios.enderex.Commands;
 
 import fr.infinitystudios.enderex.Utils.InvUtils;
+import fr.infinitystudios.enderex.Utils.UsermapCache;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import java.util.List;
+import java.util.UUID;
 
 public class EnderEXSeeCommand implements TabExecutor {
     @Override
@@ -29,10 +31,13 @@ public class EnderEXSeeCommand implements TabExecutor {
                 return true;
             }
             else if ((p.hasPermission("enderex.chest.admin") || p.isOp()) && args.length == 1) {
-                Player arg = Bukkit.getPlayerExact(args[0]);
-                if (arg != null) {
-                    Inventory chest = iu.GetChestInventoryAdmin(arg);
-                    if (chest != null) p.openInventory(chest);
+                UUID targetplayer = UsermapCache.getuuid(args[0]);
+                if (targetplayer != null) {
+                    Inventory chest = iu.GetChestInventoryAdmin(targetplayer);
+                    if (chest != null){
+                        InvUtils.adminstorage.put(chest, targetplayer);
+                        p.openInventory(chest);
+                    }
                     else{temp = "&7[&dEnderEX&7] &cThe player doesn't have an enderchest";p.sendMessage(ChatColor.translateAlternateColorCodes('&', temp));}
                 }
                 else{temp = "&7[&dEnderEX&7] &cThe player you specified is incorrect";p.sendMessage(ChatColor.translateAlternateColorCodes('&', temp));}

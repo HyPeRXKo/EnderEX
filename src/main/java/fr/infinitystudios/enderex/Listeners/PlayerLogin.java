@@ -26,7 +26,10 @@ public class PlayerLogin implements Listener {
         if(level == 0){
             return;
         }
-        Inventory invfromfile = new FileUtils().loadPlayerChest(e.getPlayer().getUniqueId(), level);
+        Inventory invfromfile = new FileUtils().loadPlayerChest(e.getPlayer().getUniqueId());
+        if(invfromfile == null){
+            return;
+        }
         EnderCache.set(e.getPlayer().getUniqueId(), invfromfile);
     }
 

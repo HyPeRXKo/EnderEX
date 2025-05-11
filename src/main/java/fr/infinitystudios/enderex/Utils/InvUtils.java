@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class InvUtils {
 
@@ -27,6 +28,7 @@ public class InvUtils {
     //}
 
     public static Map<Player, EnderChest> ecstorage = new HashMap<>();
+    public static Map<Inventory, UUID> adminstorage = new HashMap<>();
 
 
     //private static EnderChest Echest;
@@ -78,11 +80,55 @@ public class InvUtils {
         clone.setContents(inv.getContents());
         return clone;
     }
+    public Inventory CloneInventoryFromFileAdmin(UUID uuid){
+        FileUtils fu = new FileUtils();
+        Inventory inv;
+        String temp;
+        inv = fu.loadPlayerChest(uuid);
+        if(inv == null){
+            return null;
+        }
+
+        temp = plugin.getConfig().getString("titleadmin");
+        temp = temp.replace("%player%", UsermapCache.getname(uuid));
+        temp = ChatColor.translateAlternateColorCodes('&', temp);
+
+        Inventory clone = Bukkit.createInventory(null, inv.getSize(), temp);
+        clone.setContents(inv.getContents());
+
+        return clone;
+    }
+
     public Inventory LevelzeroInventory(){
         return Bukkit.createInventory(null, 9, plugin.getConfig().getString("title"));
     }
 
+    public Inventory GetChestInventoryAdmin(UUID uuid){
+        FileUtils fu = new FileUtils();
+        Inventory inv;
+        if(EnderCache.contains(uuid)) {
+            inv = EnderCache.get(uuid);
+        }
+        else {
+            return CloneInventoryFromFileAdmin(uuid);
+        }
 
+        if(inv == null){
+            return null;
+        }
+
+        String temp;
+        temp = plugin.getConfig().getString("titleadmin");
+        temp = temp.replace("%player%", UsermapCache.getname(uuid));
+        temp = ChatColor.translateAlternateColorCodes('&', temp);
+
+        Inventory clone = Bukkit.createInventory(null, inv.getSize(), temp);
+        clone.setContents(inv.getContents());
+
+        return clone;
+    }
+
+    /*
     @SuppressWarnings("unchecked")
     public Inventory GetChestInventoryAdmin(Player p) {
         FileUtils fu = new FileUtils();
@@ -114,6 +160,8 @@ public class InvUtils {
         return null;
     }
 
+     */
+
     public static boolean permcheck(Player p){
         return p.hasPermission("enderex.chest.1") ||
                 p.hasPermission("enderex.chest.2") ||
@@ -121,6 +169,5 @@ public class InvUtils {
                 p.hasPermission("enderex.chest.4") ||
                 p.hasPermission("enderex.chest.5") ||
                 p.hasPermission("enderex.chest.6");
-
     }
 }

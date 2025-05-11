@@ -14,6 +14,7 @@ import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 public class InventoryClose implements Listener {
 
@@ -39,6 +40,17 @@ public class InventoryClose implements Listener {
             }
             //if(openedec == 0){plugin.getLogger().severe("ERROR IN THE EC STORAGE PLUGIN, CONTACT HYPER IMMEDIATELY");}
             if(openedec >= 1){ogec.close(); InvUtils.ecstorage.remove(p);}
+        }
+        if(InvUtils.adminstorage.containsKey(e.getInventory())){
+            UUID playeruuid = InvUtils.adminstorage.get(e.getInventory());
+            if(EnderCache.contains(playeruuid)){
+                EnderCache.set(playeruuid, e.getInventory());
+            }
+            else{
+                new FileUtils().savePlayerChest(playeruuid, e.getInventory());
+            }
+
+            e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &aEnderchest saved."));
         }
     }
 }

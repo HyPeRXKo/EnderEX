@@ -54,12 +54,11 @@ public class FileUtils {
     }
      */
 
-    public Inventory loadPlayerChest(UUID uuid, int level) {
+    public Inventory loadPlayerChest(UUID uuid) {
         try {
             File file = new File(plugin.getDataFolder(), "data/" + uuid + ".yml");
             if (!file.exists()) {
-                // Pas de fichier : inventaire vide
-                return Bukkit.createInventory(null, 9 * level, buildTitle(level));
+                return null;
             }
 
             FileConfiguration cfg = new YamlConfiguration();
@@ -67,11 +66,13 @@ public class FileUtils {
 
             String base64 = cfg.getString("chest", "");
             if (base64.isEmpty()) {
-                return Bukkit.createInventory(null, 9 * level, buildTitle(level));
+                return null;
             }
 
             // Désérialise et récupère un Inventory
             Inventory loaded = InventorySerializer.fromBase64(base64);
+
+            int level = getLevel(loaded.getSize());
 
             // Crée un nouvel Inventory aux bonnes dimensions/titre et copie le contenu
             Inventory inv = Bukkit.createInventory(null, 9 * level, buildTitle(level));
@@ -81,7 +82,7 @@ public class FileUtils {
         } catch (IOException | ClassNotFoundException | InvalidConfigurationException e) {
             plugin.getLogger().severe("Erreur load chest pour " + UsermapCache.getname(uuid) + ": " + e.getMessage());
             // Fallback : inventaire vide
-            return Bukkit.createInventory(null, 9 * level, buildTitle(level));
+            return null;
         }
     }
 
@@ -156,6 +157,15 @@ public class FileUtils {
         if (p.hasPermission("enderex.level.4")) return 4;
         if (p.hasPermission("enderex.level.5")) return 5;
         if (p.hasPermission("enderex.level.6")) return 6;
+        return 0;
+    }
+    public Integer getLevel(Integer rows) {
+        if (rows == 9) return 1;
+        if (rows == 18) return 2;
+        if (rows == 27) return 3;
+        if (rows == 36) return 4;
+        if (rows == 45) return 5;
+        if (rows == 54) return 6;
         return 0;
     }
 }
