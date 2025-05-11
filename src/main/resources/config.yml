@@ -1,4 +1,5 @@
 configversion : 1
+loseitemsonregression: true
 title : "&d&lEnderEX | %level%"
 titleadmin: "&d&lEnderEX | %player%"
 level1: "&5Level I"

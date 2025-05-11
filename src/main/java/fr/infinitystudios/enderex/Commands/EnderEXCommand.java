@@ -28,7 +28,9 @@ public class EnderEXCommand implements TabExecutor {
                         || p.hasPermission("enderex.chest.5")
                         || p.hasPermission("enderex.chest.6")) {
                     Inventory chest = iu.CloneInventoryFromCache(p);
-                    if (chest != null) p.openInventory(chest);
+                    if (chest != null) {
+                        p.openInventory(chest);
+                    }
                 }
                 else{p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cYou don't have an enderchest yet."));}
             }

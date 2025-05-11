@@ -1,8 +1,8 @@
 package fr.infinitystudios.enderex.Commands;
 
+import fr.infinitystudios.enderex.EnderEX;
 import fr.infinitystudios.enderex.Utils.InvUtils;
 import fr.infinitystudios.enderex.Utils.UsermapCache;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,7 +13,11 @@ import org.bukkit.inventory.Inventory;
 import java.util.List;
 import java.util.UUID;
 
+
 public class EnderEXSeeCommand implements TabExecutor {
+
+    private EnderEX plugin = EnderEX.getPlugin();
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         String temp;
@@ -37,6 +41,8 @@ public class EnderEXSeeCommand implements TabExecutor {
                     if (chest != null){
                         InvUtils.adminstorage.put(chest, targetplayer);
                         p.openInventory(chest);
+                        //plugin.getLogger().info("Inventory of " + targetplayer + " opened for " + p.getName());
+                        //plugin.getLogger().info(InvUtils.adminstorage.toString());
                     }
                     else{temp = "&7[&dEnderEX&7] &cThe player doesn't have an enderchest";p.sendMessage(ChatColor.translateAlternateColorCodes('&', temp));}
                 }

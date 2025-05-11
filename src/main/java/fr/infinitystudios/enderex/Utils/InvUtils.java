@@ -30,6 +30,10 @@ public class InvUtils {
     public static Map<Player, EnderChest> ecstorage = new HashMap<>();
     public static Map<Inventory, UUID> adminstorage = new HashMap<>();
 
+    public static boolean regressionbool(){
+       return plugin.getConfig().getBoolean("loseitemsonregression");
+    }
+
 
     //private static EnderChest Echest;
 
@@ -67,17 +71,31 @@ public class InvUtils {
         Inventory inv;
         FileUtils fu = new FileUtils();
         String temp;
+        int level = fu.getLevel(p);
         temp = plugin.getConfig().getString("title");
-        temp = temp.replace("%level%", plugin.getConfig().getString("level" + fu.getLevel(p)));
+        temp = temp.replace("%level%", plugin.getConfig().getString("level" + level));
         temp = ChatColor.translateAlternateColorCodes('&', temp);
         if(EnderCache.contains(p.getUniqueId())) {
             inv = EnderCache.get(p.getUniqueId());
         }
         else{
-            return Bukkit.createInventory(null, 9*fu.getLevel(p), temp);
+            return Bukkit.createInventory(null, 9*level, temp);
         }
-        Inventory clone = Bukkit.createInventory(null, 9*fu.getLevel(p), temp);
+        Inventory clone = Bukkit.createInventory(null, 9*level, temp);
+        if(inv.getSize() > clone.getSize()){
+            if(!regressionbool()){
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cYou cannot open your enderchest because you lost your previous level."));
+                return null;
+            }
+            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cYou lost some items due to your level regression."));
+            for(int i = 0; i < 9*level; i++){
+                clone.setItem(i, inv.getItem(i));
+            }
+            //plugin.getLogger().info(fu.getLevel(p) + " " + clone.getSize());
+            return clone;
+        }
         clone.setContents(inv.getContents());
+        //plugin.getLogger().info(fu.getLevel(p) + " " + clone.getSize());
         return clone;
     }
     public Inventory CloneInventoryFromFileAdmin(UUID uuid){
@@ -104,7 +122,7 @@ public class InvUtils {
     }
 
     public Inventory GetChestInventoryAdmin(UUID uuid){
-        FileUtils fu = new FileUtils();
+        //FileUtils fu = new FileUtils();
         Inventory inv;
         if(EnderCache.contains(uuid)) {
             inv = EnderCache.get(uuid);

@@ -29,9 +29,11 @@ public class InventoryOpen implements Listener {
                     Player p = e.getPlayer();
                     InvUtils iu = new InvUtils();
                     Inventory chest = iu.CloneInventoryFromCache(p);
-                    if (chest != null) p.openInventory(chest);
-                    ((EnderChest) block.getState()).open();
-                    InvUtils.ecstorage.put(e.getPlayer(), (EnderChest) block.getState());
+                    if (chest != null){
+                        p.openInventory(chest);
+                        ((EnderChest) block.getState()).open();
+                        InvUtils.ecstorage.put(e.getPlayer(), (EnderChest) block.getState());
+                    }
                 }
                 else{e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cYou don't have an enderchest yet."));}
             }

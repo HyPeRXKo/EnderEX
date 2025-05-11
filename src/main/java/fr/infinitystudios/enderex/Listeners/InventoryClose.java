@@ -22,6 +22,22 @@ public class InventoryClose implements Listener {
 
     @EventHandler
     public void OnInventoryClose(InventoryCloseEvent e){
+        if(InvUtils.adminstorage.containsKey(e.getInventory())){
+            UUID playeruuid = InvUtils.adminstorage.get(e.getInventory());
+            if(EnderCache.contains(playeruuid)){
+                EnderCache.set(playeruuid, e.getInventory());
+                //plugin.getLogger().info("Adminchest saved.");
+            }
+            else{
+                new FileUtils().savePlayerChest(playeruuid, e.getInventory());
+                //plugin.getLogger().info("Adminchest FILE saved.");
+            }
+
+            //EnderCache.debug();
+            e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &aEnderchest saved."));
+            return;
+        }
+
         String temp = plugin.getConfig().getString("title");
         temp = temp.replace("%level%", "");
         temp = ChatColor.translateAlternateColorCodes('&', temp);
@@ -40,17 +56,9 @@ public class InventoryClose implements Listener {
             }
             //if(openedec == 0){plugin.getLogger().severe("ERROR IN THE EC STORAGE PLUGIN, CONTACT HYPER IMMEDIATELY");}
             if(openedec >= 1){ogec.close(); InvUtils.ecstorage.remove(p);}
-        }
-        if(InvUtils.adminstorage.containsKey(e.getInventory())){
-            UUID playeruuid = InvUtils.adminstorage.get(e.getInventory());
-            if(EnderCache.contains(playeruuid)){
-                EnderCache.set(playeruuid, e.getInventory());
-            }
-            else{
-                new FileUtils().savePlayerChest(playeruuid, e.getInventory());
-            }
 
-            e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &aEnderchest saved."));
+            return;
         }
+
     }
 }

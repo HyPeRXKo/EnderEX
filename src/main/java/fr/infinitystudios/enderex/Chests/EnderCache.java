@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class EnderCache {
 
-    private EnderEX plugin = EnderEX.getPlugin();
+    private static EnderEX plugin = EnderEX.getPlugin();
 
     private static final Map<UUID, Inventory> CACHE = new java.util.HashMap<>();
 
@@ -32,4 +32,19 @@ public class EnderCache {
     public static void save(UUID uuid) {
         new FileUtils().savePlayerChest(uuid, CACHE.get(uuid));
     }
+
+    public static void saveAll() {
+        for (Map.Entry<UUID, Inventory> entry : CACHE.entrySet()) {
+            save(entry.getKey());
+        }
+    }
+
+    /*
+    public static void debug() {
+        for (Map.Entry<UUID, Inventory> entry : CACHE.entrySet()) {
+            plugin.getLogger().info(entry.getKey().toString() + ": " + entry.getValue().getSize() + " slots");
+        }
+    }
+     */
+
 }

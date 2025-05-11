@@ -80,7 +80,7 @@ public class FileUtils {
             return inv;
 
         } catch (IOException | ClassNotFoundException | InvalidConfigurationException e) {
-            plugin.getLogger().severe("Erreur load chest pour " + UsermapCache.getname(uuid) + ": " + e.getMessage());
+            plugin.getLogger().severe("Error load chest for " + UsermapCache.getname(uuid) + ": " + e.getMessage());
             // Fallback : inventaire vide
             return null;
         }
@@ -103,7 +103,7 @@ public class FileUtils {
             cfg.set("chest", base64);
             cfg.save(file);
         } catch (IOException e) {
-            plugin.getLogger().severe("error save chest for " + UsermapCache.getname(uuid) + ": " + e.getMessage());
+            plugin.getLogger().severe("Error save chest for " + UsermapCache.getname(uuid) + ": " + e.getMessage());
         }
     }
 
@@ -151,21 +151,23 @@ public class FileUtils {
     }
 
     public Integer getLevel(Player p) {
-        if (p.hasPermission("enderex.level.1")) return 1;
-        if (p.hasPermission("enderex.level.2")) return 2;
-        if (p.hasPermission("enderex.level.3")) return 3;
-        if (p.hasPermission("enderex.level.4")) return 4;
-        if (p.hasPermission("enderex.level.5")) return 5;
-        if (p.hasPermission("enderex.level.6")) return 6;
+        if (p.hasPermission("enderex.chest.1")) return 1;
+        else if (p.hasPermission("enderex.chest.2")) return 2;
+        else if (p.hasPermission("enderex.chest.3")) return 3;
+        else if (p.hasPermission("enderex.chest.4")) return 4;
+        else if (p.hasPermission("enderex.chest.5")) return 5;
+        else if (p.hasPermission("enderex.chest.6")) return 6;
         return 0;
     }
     public Integer getLevel(Integer rows) {
-        if (rows == 9) return 1;
-        if (rows == 18) return 2;
-        if (rows == 27) return 3;
-        if (rows == 36) return 4;
-        if (rows == 45) return 5;
-        if (rows == 54) return 6;
-        return 0;
+        return switch (rows) {
+            case 9 -> 1;
+            case 18 -> 2;
+            case 27 -> 3;
+            case 36 -> 4;
+            case 45 -> 5;
+            case 54 -> 6;
+            default -> 0;
+        };
     }
 }

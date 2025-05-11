@@ -31,11 +31,13 @@ public class PlayerLogin implements Listener {
             return;
         }
         EnderCache.set(e.getPlayer().getUniqueId(), invfromfile);
+        //plugin.getLogger().info("still loaded for " + e.getPlayer().getName());
     }
 
 
     @EventHandler
     private void onPlayerLogout(PlayerQuitEvent e) {
+        if(!EnderCache.contains(e.getPlayer().getUniqueId())){return;}
         EnderCache.save(e.getPlayer().getUniqueId());
         EnderCache.remove(e.getPlayer().getUniqueId());
     }
