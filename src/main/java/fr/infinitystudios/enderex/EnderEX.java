@@ -4,6 +4,8 @@ import fr.infinitystudios.enderex.Commands.EnderEXCommand;
 import fr.infinitystudios.enderex.Commands.EnderEXSeeCommand;
 import fr.infinitystudios.enderex.Listeners.InventoryClose;
 import fr.infinitystudios.enderex.Listeners.InventoryOpen;
+import fr.infinitystudios.enderex.Utils.FileUtils;
+import fr.infinitystudios.enderex.Utils.UsermapCache;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -12,9 +14,6 @@ import java.io.File;
 public final class EnderEX extends JavaPlugin {
 
     private static EnderEX plugin;
-
-
-
 
     @Override
     public void onEnable() {
@@ -27,6 +26,7 @@ public final class EnderEX extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryClose(), this);
         getServer().getPluginManager().registerEvents(new InventoryOpen(), this);
         checkfolder();
+        new FileUtils().loadUserMap();
     }
 
     public static EnderEX getPlugin(){
@@ -40,6 +40,7 @@ public final class EnderEX extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        UsermapCache.save();
         plugin.getLogger().info("Quitting");
     }
 }

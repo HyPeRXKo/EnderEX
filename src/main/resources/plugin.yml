@@ -1,7 +1,7 @@
 name: EnderEX
 version: '${project.version}'
 main: fr.infinitystudios.enderex.EnderEX
-api-version: 1.19
+api-version: '1.20'
 authors: [ InfinityStudios ]
 website: https://vlxproject.fr
 commands:
@@ -34,4 +34,4 @@ permissions:
     default: false
   enderex.chest.admin:
     description: admin perm
-    default: false
+    default: op

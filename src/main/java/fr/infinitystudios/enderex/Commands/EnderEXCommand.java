@@ -17,27 +17,36 @@ public class EnderEXCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String temp;
         InvUtils iu = new InvUtils();
         if (sender instanceof Player) {
             Player p = (Player) sender;
             if (args.length == 0) {
                 if (p.hasPermission("enderex.chest.1")) {
+                    plugin.getLogger().info("perm 1");
                     Inventory chest = iu.GetChestInventory(p, 1);
                     if (chest != null) p.openInventory(chest);
-                } else if (p.hasPermission("enderex.chest.2")) {
+                }
+                else if (p.hasPermission("enderex.chest.2")) {
+                    plugin.getLogger().info("perm 2");
                     Inventory chest = iu.GetChestInventory(p, 2);
                     if (chest != null) p.openInventory(chest);
-                } else if (p.hasPermission("enderex.chest.3")) {
+                }
+                else if (p.hasPermission("enderex.chest.3")) {
+                    plugin.getLogger().info("perm 3");
                     Inventory chest = iu.GetChestInventory(p, 3);
                     if (chest != null) p.openInventory(chest);
-                } else if (p.hasPermission("enderex.chest.4")) {
+                }
+                else if (p.hasPermission("enderex.chest.4")) {
+                    plugin.getLogger().info("perm 4");
                     Inventory chest = iu.GetChestInventory(p, 4);
                     if (chest != null) p.openInventory(chest);
-                } else if (p.hasPermission("enderex.chest.5")) {
+                }
+                else if (p.hasPermission("enderex.chest.5")) {
+                    plugin.getLogger().info("perm 5");
                     Inventory chest = iu.GetChestInventory(p, 5);
                     if (chest != null) p.openInventory(chest);
-                } else if (p.hasPermission("enderex.chest.6")) {
+                }
+                else if (p.hasPermission("enderex.chest.6")) {
                     Inventory chest = iu.GetChestInventory(p, 6);
                     if (chest != null) p.openInventory(chest);
                 }

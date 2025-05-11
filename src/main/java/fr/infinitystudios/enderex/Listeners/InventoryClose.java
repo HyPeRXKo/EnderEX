@@ -35,7 +35,7 @@ public class InventoryClose implements Listener {
                     openedec++;
                 }
             }
-            if(openedec == 0){plugin.getLogger().severe("ERROR IN THE EC STORAGE PLUGIN, CONTACT HYPER IMMEDIATLY");}
+            //if(openedec == 0){plugin.getLogger().severe("ERROR IN THE EC STORAGE PLUGIN, CONTACT HYPER IMMEDIATELY");}
             if(openedec == 1){ogec.close(); InvUtils.ecstorage.remove(p);}
             if(openedec >= 2){InvUtils.ecstorage.remove(p);}
         }
