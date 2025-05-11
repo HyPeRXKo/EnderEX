@@ -1,10 +1,14 @@
 package fr.infinitystudios.enderex.Listeners;
 
+import fr.infinitystudios.enderex.Chests.EnderCache;
 import fr.infinitystudios.enderex.EnderEX;
+import fr.infinitystudios.enderex.Utils.FileUtils;
 import fr.infinitystudios.enderex.Utils.UsermapCache;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 
 public class PlayerLogin implements Listener {
 
@@ -12,7 +16,24 @@ public class PlayerLogin implements Listener {
 
     @EventHandler
     private void onPlayerLogin(PlayerLoginEvent e) {
-        if(UsermapCache.contains(e.getPlayer().getName())) return;
-        UsermapCache.put(e.getPlayer().getName(), e.getPlayer().getUniqueId());
+        if(!UsermapCache.containsname(e.getPlayer().getName())){
+            UsermapCache.putname(e.getPlayer().getName(), e.getPlayer().getUniqueId());
+            UsermapCache.putuuid(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        }
+
+        FileUtils fu = new FileUtils();
+        int level = fu.getLevel(e.getPlayer());
+        if(level == 0){
+            return;
+        }
+        Inventory invfromfile = new FileUtils().loadPlayerChest(e.getPlayer().getUniqueId(), level);
+        EnderCache.set(e.getPlayer().getUniqueId(), invfromfile);
+    }
+
+
+    @EventHandler
+    private void onPlayerLogout(PlayerQuitEvent e) {
+        EnderCache.save(e.getPlayer().getUniqueId());
+        EnderCache.remove(e.getPlayer().getUniqueId());
     }
 }

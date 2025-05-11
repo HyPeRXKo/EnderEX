@@ -26,7 +26,13 @@ public final class EnderEX extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryClose(), this);
         getServer().getPluginManager().registerEvents(new InventoryOpen(), this);
         checkfolder();
-        new FileUtils().loadUserMap();
+        UsermapCache.load();
+    }
+
+    @Override
+    public void onDisable() {
+        UsermapCache.save();
+        plugin.getLogger().info("Quitting");
     }
 
     public static EnderEX getPlugin(){
@@ -38,9 +44,4 @@ public final class EnderEX extends JavaPlugin {
         if( !subfolder.exists() ) subfolder.mkdir();
     }
 
-    @Override
-    public void onDisable() {
-        UsermapCache.save();
-        plugin.getLogger().info("Quitting");
-    }
 }

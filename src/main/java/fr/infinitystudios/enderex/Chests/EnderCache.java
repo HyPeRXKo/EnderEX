@@ -30,6 +30,6 @@ public class EnderCache {
     }
 
     public static void save(UUID uuid) {
-        new FileUtils().SaveChestConfig(uuid, CACHE.get(uuid));
+        new FileUtils().savePlayerChest(uuid, CACHE.get(uuid));
     }
 }

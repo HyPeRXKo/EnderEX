@@ -21,33 +21,13 @@ public class EnderEXCommand implements TabExecutor {
         if (sender instanceof Player) {
             Player p = (Player) sender;
             if (args.length == 0) {
-                if (p.hasPermission("enderex.chest.1")) {
-                    plugin.getLogger().info("perm 1");
-                    Inventory chest = iu.GetChestInventory(p, 1);
-                    if (chest != null) p.openInventory(chest);
-                }
-                else if (p.hasPermission("enderex.chest.2")) {
-                    plugin.getLogger().info("perm 2");
-                    Inventory chest = iu.GetChestInventory(p, 2);
-                    if (chest != null) p.openInventory(chest);
-                }
-                else if (p.hasPermission("enderex.chest.3")) {
-                    plugin.getLogger().info("perm 3");
-                    Inventory chest = iu.GetChestInventory(p, 3);
-                    if (chest != null) p.openInventory(chest);
-                }
-                else if (p.hasPermission("enderex.chest.4")) {
-                    plugin.getLogger().info("perm 4");
-                    Inventory chest = iu.GetChestInventory(p, 4);
-                    if (chest != null) p.openInventory(chest);
-                }
-                else if (p.hasPermission("enderex.chest.5")) {
-                    plugin.getLogger().info("perm 5");
-                    Inventory chest = iu.GetChestInventory(p, 5);
-                    if (chest != null) p.openInventory(chest);
-                }
-                else if (p.hasPermission("enderex.chest.6")) {
-                    Inventory chest = iu.GetChestInventory(p, 6);
+                if (p.hasPermission("enderex.chest.1")
+                        || p.hasPermission("enderex.chest.2")
+                        || p.hasPermission("enderex.chest.3")
+                        || p.hasPermission("enderex.chest.4")
+                        || p.hasPermission("enderex.chest.5")
+                        || p.hasPermission("enderex.chest.6")) {
+                    Inventory chest = iu.CloneInventoryFromCache(p);
                     if (chest != null) p.openInventory(chest);
                 }
                 else{p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cYou don't have an enderchest yet."));}

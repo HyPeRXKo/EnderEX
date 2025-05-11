@@ -1,5 +1,6 @@
 package fr.infinitystudios.enderex.Utils;
 
+import fr.infinitystudios.enderex.Chests.EnderCache;
 import fr.infinitystudios.enderex.EnderEX;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -30,6 +31,7 @@ public class InvUtils {
 
     //private static EnderChest Echest;
 
+    /*
     @SuppressWarnings("unchecked")
     public Inventory GetChestInventory(Player p,int Level){
         FileUtils fu = new FileUtils();
@@ -54,6 +56,30 @@ public class InvUtils {
             }
         }
         return null;
+    }
+
+     */
+
+
+    public Inventory CloneInventoryFromCache(Player p){
+        Inventory inv;
+        FileUtils fu = new FileUtils();
+        String temp;
+        temp = plugin.getConfig().getString("title");
+        temp = temp.replace("%level%", plugin.getConfig().getString("level" + fu.getLevel(p)));
+        temp = ChatColor.translateAlternateColorCodes('&', temp);
+        if(EnderCache.contains(p.getUniqueId())) {
+            inv = EnderCache.get(p.getUniqueId());
+        }
+        else{
+            return Bukkit.createInventory(null, 9*fu.getLevel(p), temp);
+        }
+        Inventory clone = Bukkit.createInventory(null, 9*fu.getLevel(p), temp);
+        clone.setContents(inv.getContents());
+        return clone;
+    }
+    public Inventory LevelzeroInventory(){
+        return Bukkit.createInventory(null, 9, plugin.getConfig().getString("title"));
     }
 
 
