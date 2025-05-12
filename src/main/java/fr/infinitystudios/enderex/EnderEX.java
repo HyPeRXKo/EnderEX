@@ -25,8 +25,9 @@ public final class EnderEX extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         plugin.getLogger().info("Starting");
-        getConfig().options().configuration();
         saveDefaultConfig();
+        getConfig().options().copyDefaults(true);
+        saveConfig();
         getCommand("EnderEX").setExecutor(new EnderEXCommand());
         getCommand("EnderEXsee").setExecutor(new EnderEXSeeCommand());
         getServer().getPluginManager().registerEvents(new InventoryClose(), this);
@@ -59,7 +60,9 @@ public final class EnderEX extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             try {
                 UsermapCache.save();
-                plugin.getLogger().info("Usermap saved");
+                if(plugin.getConfig().getBoolean("consolesavemessages")) {
+                    plugin.getLogger().info("Usermap saved");
+                }
                 EnderCache.saveAll();
             } catch (Exception e) {
                 plugin.getLogger().severe(e.getMessage());

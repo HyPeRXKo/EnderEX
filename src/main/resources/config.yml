@@ -1,5 +1,6 @@
 configversion : 1
-loseitemsonregression: true
+loseitemsonregression: false
+consolesavemessages: false
 title : "&d&lEnderEX | %level%"
 titleadmin: "&d&lEnderEX | %player%"
 level1: "&5Level I"

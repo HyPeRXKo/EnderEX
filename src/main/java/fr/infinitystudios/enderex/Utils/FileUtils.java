@@ -115,7 +115,9 @@ public class FileUtils {
                 userMapConfig.set("usermap." + entry.getKey(), entry.getValue().toString());
             }
             userMapConfig.save(userMapFile);
-            plugin.getLogger().info("UserMap saved, entries: " + USER_MAP.size());
+            if(plugin.getConfig().getBoolean("consolesavemessages")){
+                plugin.getLogger().info("UserMap saved, entries: " + USER_MAP.size());
+            }
         } catch (IOException e) {
             plugin.getLogger().severe("Failed to save usermap.yml: " + e.getMessage());
         }
