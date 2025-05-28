@@ -2,6 +2,7 @@ configversion : 1
 loseitemsonregression: false
 consolesavemessages: false
 transferenderchesttoenderexonlogin: false
+disablephysicalenderchestswitchtoenderex: false
 title : "&d&lEnderEX | %level%"
 titleadmin: "&d&lEnderEX | %player%"
 level1: "&5Level I"
