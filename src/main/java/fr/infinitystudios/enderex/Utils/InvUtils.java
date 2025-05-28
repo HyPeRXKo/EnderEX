@@ -149,7 +149,7 @@ public class InvUtils {
     public void TransferVanillaChestToEnderEx(Player commandSender, UUID uuidtarget, Boolean force) {
         Player target = plugin.getServer().getPlayer(uuidtarget);
         ItemStack[] vanillaContent = target.getEnderChest().getContents();
-        if (vanillaContent.length == 0) {
+        if (target.getEnderChest().isEmpty()) {
             commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cThis player has no items in their enderchest."));
             return;
         }
@@ -170,23 +170,32 @@ public class InvUtils {
             }
         }
 
+        if (plugin.getConfig().getBoolean("erasevanillaenderchestontransfer")) {
+            target.getEnderChest().clear();
+        }
+
         commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &aYou have transferred the items from " + target.getName() + "'s enderchest to your his EnderEX chest."));
         return;
     }
 
     public void TransferVanillaChestToEnderExOnLogin(Player target) {
-        UUID uuidtarget = target.getUniqueId();
-        ItemStack[] vanillaContent = target.getEnderChest().getContents();
-        if (vanillaContent.length == 0) {
-            return;
-        }
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            UUID uuidtarget = target.getUniqueId();
+            ItemStack[] vanillaContent = target.getEnderChest().getContents();
+            if (target.getEnderChest().isEmpty()) {
+                return;
+            }
 
-        Inventory inv = CloneInventoryFromCache(target);
-        if (inv.isEmpty()) {
-            inv.setContents(vanillaContent);
-            EnderCache.set(uuidtarget, inv);
-        }
-        return;
+            Inventory inv = CloneInventoryFromCache(target);
+            if (inv.isEmpty()) {
+                inv.setContents(vanillaContent);
+                EnderCache.set(uuidtarget, inv);
+            }
+
+            if (plugin.getConfig().getBoolean("erasevanillaenderchestontransfer")) {
+                target.getEnderChest().clear();
+            }
+        }, 20L);
     }
 
     /*

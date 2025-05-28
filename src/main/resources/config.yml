@@ -3,6 +3,7 @@ loseitemsonregression: false
 consolesavemessages: false
 transferenderchesttoenderexonlogin: false
 disablephysicalenderchestswitchtoenderex: false
+erasevanillaenderchestontransfer: true
 title : "&d&lEnderEX | %level%"
 titleadmin: "&d&lEnderEX | %player%"
 level1: "&5Level I"

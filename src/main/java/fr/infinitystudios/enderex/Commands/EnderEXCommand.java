@@ -12,8 +12,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class EnderEXCommand implements TabExecutor {
 
@@ -51,21 +53,26 @@ public class EnderEXCommand implements TabExecutor {
                     p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cYou don't have the permission to use this command."));
                 } else {
                     UUID targetplayer = UsermapCache.getuuid(args[1]);
-                    if (targetplayer != null) {
+                    if (targetplayer == null) {
+                        p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cThe player you specified is incorrect."));
+                        return true;
+                    } else {
                         Player target = p.getServer().getPlayer(targetplayer);
                         if (target == null) {
                             p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cThe player you specified is incorrect."));
                             return true;
                         } else {
-                            if (!target.hasPermission("enderex.chest.3") || !target.hasPermission("enderex.chest.4") || !target.hasPermission("enderex.chest.5") || !target.hasPermission("enderex.chest.6")) {
+                            if (!( target.hasPermission("enderex.chest.3") || target.hasPermission("enderex.chest.4") || target.hasPermission("enderex.chest.5") || target.hasPermission("enderex.chest.6"))) {
                                 p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cThe player don't have a big enough permission."));
                                 return true;
                             } else {
                                 if (args.length == 3 && args[2].equalsIgnoreCase("force")) {
                                     iu.TransferVanillaChestToEnderEx(p, targetplayer, true);
+                                    return true;
                                 }
                                 else {
                                     iu.TransferVanillaChestToEnderEx(p, targetplayer, false);
+                                    return true;
                                 }
                             }
                         }
@@ -85,14 +92,24 @@ public class EnderEXCommand implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if(args.length == 0) {
-            return List.of("transfer");
+        if(sender instanceof Player) {
+            Player p = (Player) sender;
+            if (!p.hasPermission("enderex.chest.admin") || !p.isOp()) {
+                return null;
+            }
         }
-        if(args.length == 1 && args[0].equalsIgnoreCase("transfer")) {
-            return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
-        }
-        if(args.length == 2 && args[0].equalsIgnoreCase("transfer")) {
-            return List.of("force");
+        switch (args.length) {
+            case 1 -> {
+                return Stream.of("transfer").filter(s1 -> s1.startsWith(args[0])).toList();
+            }
+            case 2 -> {
+                if (args[0].equalsIgnoreCase("transfer")) {
+                    return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).filter(s1 -> s1.startsWith(args[1])).toList();
+                }
+            }
+            case 3 -> {
+                return Collections.singletonList("force");
+            }
         }
         return null;
     }
