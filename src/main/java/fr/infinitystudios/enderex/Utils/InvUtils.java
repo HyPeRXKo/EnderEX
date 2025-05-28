@@ -146,6 +146,49 @@ public class InvUtils {
         return clone;
     }
 
+    public void TransferVanillaChestToEnderEx(Player commandSender, UUID uuidtarget, Boolean force) {
+        Player target = plugin.getServer().getPlayer(uuidtarget);
+        ItemStack[] vanillaContent = target.getEnderChest().getContents();
+        if (vanillaContent.length == 0) {
+            commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cThis player has no items in their enderchest."));
+            return;
+        }
+
+        Inventory inv = CloneInventoryFromCache(target);
+        if (inv.isEmpty()) {
+            inv.setContents(vanillaContent);
+            EnderCache.set(uuidtarget, inv);
+        }
+        else {
+            if (force) {
+                inv.setContents(vanillaContent);
+                EnderCache.set(uuidtarget, inv);
+            }
+            else {
+                commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cThis player already has items in their EnderEX chest."));
+                return;
+            }
+        }
+
+        commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &aYou have transferred the items from " + target.getName() + "'s enderchest to your his EnderEX chest."));
+        return;
+    }
+
+    public void TransferVanillaChestToEnderExOnLogin(Player target) {
+        UUID uuidtarget = target.getUniqueId();
+        ItemStack[] vanillaContent = target.getEnderChest().getContents();
+        if (vanillaContent.length == 0) {
+            return;
+        }
+
+        Inventory inv = CloneInventoryFromCache(target);
+        if (inv.isEmpty()) {
+            inv.setContents(vanillaContent);
+            EnderCache.set(uuidtarget, inv);
+        }
+        return;
+    }
+
     /*
     @SuppressWarnings("unchecked")
     public Inventory GetChestInventoryAdmin(Player p) {
