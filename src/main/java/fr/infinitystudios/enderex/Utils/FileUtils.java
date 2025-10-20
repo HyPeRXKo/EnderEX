@@ -115,7 +115,7 @@ public class FileUtils {
                 userMapConfig.set("usermap." + entry.getKey(), entry.getValue().toString());
             }
             userMapConfig.save(userMapFile);
-            if(plugin.getConfig().getBoolean("consolesavemessages")){
+            if(plugin.getConfig().getBoolean("console_save_messages")){
                 plugin.getLogger().info("UserMap saved, entries: " + USER_MAP.size());
             }
         } catch (IOException e) {
@@ -153,12 +153,12 @@ public class FileUtils {
     }
 
     public Integer getLevel(Player p) {
-        if (p.hasPermission("enderex.chest.1")) return 1;
-        else if (p.hasPermission("enderex.chest.2")) return 2;
-        else if (p.hasPermission("enderex.chest.3")) return 3;
-        else if (p.hasPermission("enderex.chest.4")) return 4;
+        if (p.hasPermission("enderex.chest.6")) return 6;
         else if (p.hasPermission("enderex.chest.5")) return 5;
-        else if (p.hasPermission("enderex.chest.6")) return 6;
+        else if (p.hasPermission("enderex.chest.4")) return 4;
+        else if (p.hasPermission("enderex.chest.3")) return 3;
+        else if (p.hasPermission("enderex.chest.2")) return 2;
+        else if (p.hasPermission("enderex.chest.1")) return 1;
         return 0;
     }
     public Integer getLevel(Integer rows) {

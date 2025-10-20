@@ -1,10 +1,39 @@
-configversion : 1
-loseitemsonregression: false
-consolesavemessages: false
-transferenderchesttoenderexonlogin: false
-disablephysicalenderchestswitchtoenderex: false
-erasevanillaenderchestontransfer: true
-title : "&d&lEnderEX | %level%"
+configversion: 2
+
+#Plugin mode: simple or advanced
+#Simple: use the simple_rows for everyone. No permission override!
+#Advanced: use the permission based system. (enderex.chest.1 to enderex.chest.6)
+plugin_mode: advanced
+
+#Correct value: 1 to 6. Default: 3
+simple_rows: 3
+
+#If the player is going backward on the permission (3 to 2) or you change the simple_rows to something lower.
+#For example, it will prevent the opening of the chest to not lose the items in the third row.
+#This is checked by how many items are in the saved chest of the player.
+lose_items_on_regressions: false
+
+#Enable or disable (true/false) the periodic save message of the cache of the chests in the console.
+console_save_messages: false
+
+#Enable or disable (true/false) the transfer of the vanilla enderchest to the EnderEX system on login.
+#Will only do it if the player EnderEX chest is empty AND has a MINIMUM of 3 rows (simple_rows 3 or enderex.chest.3)
+transfer_vanilla_enderchest_to_enderex_on_login: false
+
+#Enable or disable (true/false) the erasing of the vanilla enderchest on transfer.
+erase_vanilla_enderchest_on_transfer: true
+
+#Enable or disable (true/false) the disable of the physical enderchest switch to EnderEX.
+disable_physical_enderchest_switch_to_enderex: false
+
+#Enable the need for the permssion when a player want to open the physical enderchest. (enderex.physicalopen)
+need_permission_for_physical_opening: false
+
+#Enable the need for the permission when a player want to open the EnderEX chest with the command. (enderex.commandopen)
+need_permission_for_command_opening: false
+
+#Title of the chest. %level% will be replaced by the corresponding level name.
+title: "&d&lEnderEX | %level%"
 titleadmin: "&d&lEnderEX | %player%"
 level1: "&5Level I"
 level2: "&5Level II"

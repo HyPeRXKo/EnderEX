@@ -31,7 +31,7 @@ public class InvUtils {
     public static Map<Inventory, UUID> adminstorage = new HashMap<>();
 
     public static boolean regressionbool(){
-       return plugin.getConfig().getBoolean("loseitemsonregression");
+       return plugin.getConfig().getBoolean("lose_items_on_regressions");
     }
 
 
@@ -170,7 +170,7 @@ public class InvUtils {
             }
         }
 
-        if (plugin.getConfig().getBoolean("erasevanillaenderchestontransfer")) {
+        if (plugin.getConfig().getBoolean("erase_vanilla_enderchest_on_transfer")) {
             target.getEnderChest().clear();
         }
 
@@ -192,7 +192,7 @@ public class InvUtils {
                 EnderCache.set(uuidtarget, inv);
             }
 
-            if (plugin.getConfig().getBoolean("erasevanillaenderchestontransfer")) {
+            if (plugin.getConfig().getBoolean("erase_vanilla_enderchest_on_transfer")) {
                 target.getEnderChest().clear();
             }
         }, 20L);

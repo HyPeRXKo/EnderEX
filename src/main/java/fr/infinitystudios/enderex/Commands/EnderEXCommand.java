@@ -48,6 +48,11 @@ public class EnderEXCommand implements TabExecutor {
                     p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cYou need to specify a player."));
                 }
             }
+            if (args.length == 1 && args[0].equalsIgnoreCase("reload")){
+                if(!p.hasPermission("enderex.chest.admin") || !p.isOp()){return true;}
+                plugin.getConfigManager().loadAndUpdateConfig();
+                p.sendMessage("&7[&dEnderEX&7] &aConfig reloaded");
+            }
             if ((args.length == 2 || args.length == 3) && args[0].equalsIgnoreCase("transfer")) {
                 if (!p.hasPermission("enderex.chest.admin") || !p.isOp()) {
                     p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cYou don't have the permission to use this command."));
@@ -86,6 +91,7 @@ public class EnderEXCommand implements TabExecutor {
 
     // args.length = +1 to index
     //[enderex] args[0/1]    args[1/2]   args[2/3]
+    //enderex   reload
     //enderex   transfer    (player)  (force)          (player)
 
 
@@ -100,7 +106,7 @@ public class EnderEXCommand implements TabExecutor {
         }
         switch (args.length) {
             case 1 -> {
-                return Stream.of("transfer").filter(s1 -> s1.startsWith(args[0])).toList();
+                return Stream.of("transfer", "reload").filter(s1 -> s1.startsWith(args[0])).toList();
             }
             case 2 -> {
                 if (args[0].equalsIgnoreCase("transfer")) {

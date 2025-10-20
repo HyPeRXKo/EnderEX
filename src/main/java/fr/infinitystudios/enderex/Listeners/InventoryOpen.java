@@ -21,7 +21,7 @@ public class InventoryOpen implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void PlayerInteractEvent(PlayerInteractEvent e) {
-        if(plugin.getConfig().getBoolean("disablephysicalenderchestswitchtoenderex")){return;}
+        if(plugin.getConfig().getBoolean("disable_physical_enderchest_switch_to_enderex")){return;}
         if (e.getClickedBlock() != null) {
             Block block = e.getClickedBlock();
             if (block.getType() == Material.ENDER_CHEST && Action.RIGHT_CLICK_BLOCK == e.getAction() && !e.isCancelled()) {

@@ -35,7 +35,7 @@ public class PlayerLogin implements Listener {
             EnderCache.set(e.getPlayer().getUniqueId(), invfromfile);
         }
 
-        if(plugin.getConfig().getBoolean("transferenderchesttoenderexonlogin")) {
+        if(plugin.getConfig().getBoolean("transfer_vanilla_enderchest_to_enderex_on_login")) {
             Player p = e.getPlayer();
             if(p.hasPermission("enderex.chest.3") || p.hasPermission("enderex.chest.4") || p.hasPermission("enderex.chest.5") || p.hasPermission("enderex.chest.6")) {
                 new InvUtils().TransferVanillaChestToEnderExOnLogin(e.getPlayer());

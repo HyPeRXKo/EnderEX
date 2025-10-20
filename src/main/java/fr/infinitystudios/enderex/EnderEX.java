@@ -6,6 +6,7 @@ import fr.infinitystudios.enderex.Commands.EnderEXSeeCommand;
 import fr.infinitystudios.enderex.Listeners.InventoryClose;
 import fr.infinitystudios.enderex.Listeners.InventoryOpen;
 import fr.infinitystudios.enderex.Listeners.PlayerLogin;
+import fr.infinitystudios.enderex.Utils.ConfigManager;
 import fr.infinitystudios.enderex.Utils.FileUtils;
 import fr.infinitystudios.enderex.Utils.UsermapCache;
 import org.bukkit.Bukkit;
@@ -20,14 +21,14 @@ import java.util.UUID;
 public final class EnderEX extends JavaPlugin {
 
     private static EnderEX plugin;
+    private ConfigManager configManager;
 
     @Override
     public void onEnable() {
         plugin = this;
         plugin.getLogger().info("Starting");
-        saveDefaultConfig();
-        getConfig().options().copyDefaults(true);
-        saveConfig();
+        configManager = new ConfigManager(this);
+        configManager.loadAndUpdateConfig();
         getCommand("EnderEX").setExecutor(new EnderEXCommand());
         getCommand("EnderEXsee").setExecutor(new EnderEXSeeCommand());
         getServer().getPluginManager().registerEvents(new InventoryClose(), this);
@@ -49,6 +50,10 @@ public final class EnderEX extends JavaPlugin {
         return plugin;
     }
 
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
     public static void checkfolder(){
         File subfolder = new File(plugin.getDataFolder() + "/data/");
         if( !subfolder.exists() ) subfolder.mkdir();
@@ -60,7 +65,7 @@ public final class EnderEX extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             try {
                 UsermapCache.save();
-                if(plugin.getConfig().getBoolean("consolesavemessages")) {
+                if(plugin.getConfig().getBoolean("console_save_messages")) {
                     plugin.getLogger().info("Usermap saved");
                 }
                 EnderCache.saveAll();
