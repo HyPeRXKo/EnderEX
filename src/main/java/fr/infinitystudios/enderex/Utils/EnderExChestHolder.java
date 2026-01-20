@@ -7,7 +7,7 @@ public class EnderExChestHolder implements InventoryHolder {
 
     @Override
     public Inventory getInventory() {
-        return null; // OBLIGATOIRE mais jamais utilisé
+        return null;
     }
 
 }

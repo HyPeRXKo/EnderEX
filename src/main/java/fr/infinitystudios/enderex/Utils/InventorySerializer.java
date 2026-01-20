@@ -68,20 +68,6 @@ public class InventorySerializer {
         }
     }
 
-    /** Convertit un Inventory en String Base64 */
-    public static String OLDtoBase64(Inventory inventory) throws IOException {
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        BukkitObjectOutputStream out = new BukkitObjectOutputStream(byteStream);
-        // Taille + items
-        out.writeInt(inventory.getSize());
-        for (ItemStack item : inventory.getContents()) {
-            out.writeObject(item);
-        }
-        out.close();
-        return Base64.getEncoder().encodeToString(byteStream.toByteArray());
-    }
-
-    /** Reconstruit un Inventory à partir d’une String Base64 */
     public static Inventory OLDfromBase64(String data) throws IOException, ClassNotFoundException {
         byte[] bytes = Base64.getDecoder().decode(data);
         ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
