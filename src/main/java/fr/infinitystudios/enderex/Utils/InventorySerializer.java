@@ -6,15 +6,70 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Base64;
 
 public class InventorySerializer {
 
+    public static String inventoryToNBTBase64(Inventory inventory) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
+
+            // Taille de l'inventory
+            dos.writeInt(inventory.getSize());
+
+            for (int i = 0; i < inventory.getSize(); i++) {
+                ItemStack item = inventory.getItem(i);
+
+                if (item == null) {
+                    // On écrit une longueur 0 → pas d’item
+                    dos.writeInt(0);
+                } else {
+                    byte[] nbt = item.serializeAsBytes();
+                    dos.writeInt(nbt.length);
+                    dos.write(nbt);
+                }
+            }
+
+            dos.flush();
+            return Base64.getEncoder().encodeToString(baos.toByteArray());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error in NBT Serialisation", e);
+        }
+    }
+
+    public static Inventory nbtBase64ToInventory(String base64) {
+        try {
+            byte[] data = Base64.getDecoder().decode(base64);
+            ByteArrayInputStream bais = new ByteArrayInputStream(data);
+            DataInputStream dis = new DataInputStream(bais);
+
+            int size = dis.readInt();
+            Inventory inv = Bukkit.createInventory(null, size);
+
+            for (int i = 0; i < size; i++) {
+                int length = dis.readInt();
+
+                if (length > 0) {
+                    byte[] nbt = new byte[length];
+                    dis.readFully(nbt);
+
+                    ItemStack item = ItemStack.deserializeBytes(nbt);
+                    inv.setItem(i, item);
+                }
+            }
+
+            return inv;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error in NBT Serialisation", e);
+        }
+    }
+
     /** Convertit un Inventory en String Base64 */
-    public static String toBase64(Inventory inventory) throws IOException {
+    public static String OLDtoBase64(Inventory inventory) throws IOException {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         BukkitObjectOutputStream out = new BukkitObjectOutputStream(byteStream);
         // Taille + items
@@ -27,7 +82,7 @@ public class InventorySerializer {
     }
 
     /** Reconstruit un Inventory à partir d’une String Base64 */
-    public static Inventory fromBase64(String data) throws IOException, ClassNotFoundException {
+    public static Inventory OLDfromBase64(String data) throws IOException, ClassNotFoundException {
         byte[] bytes = Base64.getDecoder().decode(data);
         ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
         BukkitObjectInputStream in = new BukkitObjectInputStream(byteStream);

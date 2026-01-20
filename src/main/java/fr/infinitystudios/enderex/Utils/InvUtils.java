@@ -2,98 +2,66 @@ package fr.infinitystudios.enderex.Utils;
 
 import fr.infinitystudios.enderex.Chests.EnderCache;
 import fr.infinitystudios.enderex.EnderEX;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.block.EnderChest;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class InvUtils {
 
     private static final EnderEX plugin = EnderEX.getPlugin();
-
-    //public static EnderChest getEchest() {
-        //return Echest;
-    //}
-
-    //public static void setEchest(EnderChest echest) {
-        //Echest = echest;
-    //}
+    private TextComponent cc(String text) {
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(text);
+    }
+    public boolean regressionbool(){
+        return plugin.getConfig().getBoolean("lose_items_on_regressions");
+    }
 
     public static Map<Player, EnderChest> ecstorage = new HashMap<>();
-    public static Map<Inventory, UUID> adminstorage = new HashMap<>();
 
-    public static boolean regressionbool(){
-       return plugin.getConfig().getBoolean("lose_items_on_regressions");
-    }
-
-
-    //private static EnderChest Echest;
-
-    /*
-    @SuppressWarnings("unchecked")
-    public Inventory GetChestInventory(Player p,int Level){
-        FileUtils fu = new FileUtils();
-        FileConfiguration config = fu.GetChestConfig(p);
-        if(config != null){
-            ItemStack[] chestitems = ((List<ItemStack>) config.get("chest")).toArray(new ItemStack[0]);
-            String temp;
-            temp = plugin.getConfig().getString("title");
-            temp = temp.replace("%level%", plugin.getConfig().getString("level" + Level));
-            temp = ChatColor.translateAlternateColorCodes('&', temp);
-            Inventory chest = Bukkit.createInventory(p, 9*Level, temp);
-            chest.setContents(chestitems);
-            return chest;
-        }
-        else{
-            if(permcheck(p)){
-                String temp;
-                temp = plugin.getConfig().getString("title");
-                temp = temp.replace("%level%", plugin.getConfig().getString("level" + Level));
-                temp = ChatColor.translateAlternateColorCodes('&', temp);
-                return Bukkit.createInventory(p, 9*Level, temp);
-            }
-        }
-        return null;
-    }
-
-     */
-
+    //FIRST = CHEST OWNER (content), SECOND = WHO OPENED IT (own player/admin)
+    public static Map<UUID, UUID> openedChests = new HashMap<>();
 
     public Inventory CloneInventoryFromCache(Player p){
         Inventory inv;
-        FileUtils fu = new FileUtils();
         String temp;
-        int level = fu.getLevel(p);
+        int level = FileUtils.getLevel(p);
+
         temp = plugin.getConfig().getString("title");
         temp = temp.replace("%level%", plugin.getConfig().getString("level" + level));
-        temp = ChatColor.translateAlternateColorCodes('&', temp);
+        TextComponent title = cc(temp);
+
+
         if(EnderCache.contains(p.getUniqueId())) {
             inv = EnderCache.get(p.getUniqueId());
         }
         else{
-            return Bukkit.createInventory(null, 9*level, temp);
+            return plugin.getServer().createInventory(new EnderExChestHolder(), 9*level, title);
         }
-        Inventory clone = Bukkit.createInventory(null, 9*level, temp);
-        if(inv.getSize() > clone.getSize()){
-            if(!regressionbool()){
-                p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cYou cannot open your enderchest because you lost your previous level."));
-                return null;
-            }
-            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cYou lost some items due to your level regression."));
+        Inventory clone = plugin.getServer().createInventory(new EnderExChestHolder(), 9*level, title);
+
+        RegressionState regressionState = regressionCheck(p, inv);
+
+        if(regressionState == RegressionState.PROTECTED){
+            return null;
+        }
+
+        if(regressionState == RegressionState.LOST){
             for(int i = 0; i < 9*level; i++){
                 clone.setItem(i, inv.getItem(i));
             }
-            //plugin.getLogger().info(fu.getLevel(p) + " " + clone.getSize());
             return clone;
         }
+
         clone.setContents(inv.getContents());
         //plugin.getLogger().info(fu.getLevel(p) + " " + clone.getSize());
         return clone;
@@ -108,25 +76,35 @@ public class InvUtils {
         }
 
         temp = plugin.getConfig().getString("titleadmin");
-        temp = temp.replace("%player%", UsermapCache.getname(uuid));
-        temp = ChatColor.translateAlternateColorCodes('&', temp);
+        String playername = null;
 
-        Inventory clone = Bukkit.createInventory(null, inv.getSize(), temp);
+        try {
+            playername = plugin.getDatabaseManager().getUserByUUID(uuid).name();
+        } catch (SQLException ex){
+            plugin.getLogger().warning("Database error!");
+            ex.printStackTrace();
+        }
+
+        if(playername == null) playername = "error";
+
+        temp = temp.replace("%player%", playername);
+
+        TextComponent title = cc(temp);
+
+        Inventory clone = plugin.getServer().createInventory(new AdminEnderExChestHolder(uuid), inv.getSize(), title);
         clone.setContents(inv.getContents());
 
         return clone;
     }
 
-    public Inventory LevelzeroInventory(){
-        return Bukkit.createInventory(null, 9, plugin.getConfig().getString("title"));
-    }
-
     public Inventory GetChestInventoryAdmin(UUID uuid){
         //FileUtils fu = new FileUtils();
         Inventory inv;
+        String temp;
         if(EnderCache.contains(uuid)) {
             inv = EnderCache.get(uuid);
         }
+
         else {
             return CloneInventoryFromFileAdmin(uuid);
         }
@@ -135,22 +113,33 @@ public class InvUtils {
             return null;
         }
 
-        String temp;
         temp = plugin.getConfig().getString("titleadmin");
-        temp = temp.replace("%player%", UsermapCache.getname(uuid));
-        temp = ChatColor.translateAlternateColorCodes('&', temp);
+        String playername = null;
 
-        Inventory clone = Bukkit.createInventory(null, inv.getSize(), temp);
+        try {
+            playername = plugin.getDatabaseManager().getUserByUUID(uuid).name();
+        } catch (SQLException ex){
+            plugin.getLogger().warning("Database error!");
+            ex.printStackTrace();
+        }
+
+        if(playername == null) playername = "error";
+
+        temp = temp.replace("%player%", playername);
+
+        TextComponent title = cc(temp);
+
+        Inventory clone = Bukkit.createInventory(new AdminEnderExChestHolder(uuid), inv.getSize(), title);
         clone.setContents(inv.getContents());
 
         return clone;
     }
 
-    public void TransferVanillaChestToEnderEx(Player commandSender, UUID uuidtarget, Boolean force) {
+    public void TransferVanillaChestToEnderEx(CommandSender commandSender, UUID uuidtarget, Boolean force) {
         Player target = plugin.getServer().getPlayer(uuidtarget);
         ItemStack[] vanillaContent = target.getEnderChest().getContents();
         if (target.getEnderChest().isEmpty()) {
-            commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cThis player has no items in their enderchest."));
+            new MessagesUtils().TransferNoEnderchest(commandSender);
             return;
         }
 
@@ -165,7 +154,7 @@ public class InvUtils {
                 EnderCache.set(uuidtarget, inv);
             }
             else {
-                commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &cThis player already has items in their EnderEX chest."));
+                new MessagesUtils().TransferEnderchestNotEmpty(commandSender);
                 return;
             }
         }
@@ -174,10 +163,9 @@ public class InvUtils {
             target.getEnderChest().clear();
         }
 
-        commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&dEnderEX&7] &aYou have transferred the items from " + target.getName() + "'s enderchest to your his EnderEX chest."));
+        new MessagesUtils().TransferSuccesful(commandSender, target.getName());
         return;
     }
-
     public void TransferVanillaChestToEnderExOnLogin(Player target) {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             UUID uuidtarget = target.getUniqueId();
@@ -198,46 +186,80 @@ public class InvUtils {
         }, 20L);
     }
 
-    /*
-    @SuppressWarnings("unchecked")
-    public Inventory GetChestInventoryAdmin(Player p) {
-        FileUtils fu = new FileUtils();
-        FileConfiguration config = fu.GetChestConfig(p);
-        if (config != null) {
-            ItemStack[] chestitems = ((List<ItemStack>) config.get("chest")).toArray(new ItemStack[0]);
-            String temp;
-            Inventory chest;
-            temp = plugin.getConfig().getString("titleadmin");
-            temp = temp.replace("%player%", p.getName());
-            temp = ChatColor.translateAlternateColorCodes('&', temp);
-            if (p.hasPermission("enderex.chest.1")) {
-                 chest = Bukkit.createInventory(p, 9, temp);
-            } else if (p.hasPermission("enderex.chest.2")) {
-                 chest = Bukkit.createInventory(p, 9 * 2, temp);
-            } else if (p.hasPermission("enderex.chest.3")) {
-                 chest = Bukkit.createInventory(p, 9 * 3, temp);
-            } else if (p.hasPermission("enderex.chest.4")) {
-                 chest = Bukkit.createInventory(p, 9 * 4, temp);
-            } else if (p.hasPermission("enderex.chest.5")) {
-                 chest = Bukkit.createInventory(p, 9 * 5, temp);
-            } else if (p.hasPermission("enderex.chest.6")) {
-                 chest = Bukkit.createInventory(p, 9 * 6, temp);
+
+    public void HandleClosingChest(Player p, Inventory inv){
+        if(inv.getHolder(false) instanceof AdminEnderExChestHolder adminInv){
+            UUID chestOwner = adminInv.getTarget();
+            if(EnderCache.contains(chestOwner)){
+                EnderCache.set(chestOwner, inv);
             }
-            else return null;
-            chest.setContents(chestitems);
-            return chest;
+            else{
+                new FileUtils().savePlayerChest(chestOwner, inv);
+            }
+
+            new MessagesUtils().EnderchestSaved(p);
+            openedChests.remove(chestOwner);
+            return;
         }
-        return null;
+        if(inv.getHolder(false) instanceof EnderExChestHolder){
+            EnderCache.set(p.getUniqueId(), inv);
+            openedChests.remove(p.getUniqueId());
+
+            EnderChest enderChest = InvUtils.ecstorage.get(p);
+            if(enderChest == null){return;}
+
+            enderChest.close();
+            ecstorage.remove(p);
+
+            return;
+        }
     }
 
-     */
+    public boolean permCheck(Player p){
+        if(getPluginMode() == PluginMode.SIMPLE){
+            return true;
+        }
 
-    public static boolean permcheck(Player p){
         return p.hasPermission("enderex.chest.1") ||
                 p.hasPermission("enderex.chest.2") ||
                 p.hasPermission("enderex.chest.3") ||
                 p.hasPermission("enderex.chest.4") ||
                 p.hasPermission("enderex.chest.5") ||
                 p.hasPermission("enderex.chest.6");
+    }
+
+    public RegressionState regressionCheck(Player p){
+        if(EnderCache.contains(p.getUniqueId())) {
+            Inventory inv = EnderCache.get(p.getUniqueId());
+            if(inv.getSize() > 9*FileUtils.getLevel(p)){
+                MessagesUtils mu = new MessagesUtils();
+                if(!regressionbool()){
+                    mu.RegressionProtected(p);
+                    return RegressionState.PROTECTED;
+                }
+                mu.RegressionLost(p);
+                return RegressionState.LOST;
+            }
+        }
+        return RegressionState.FALSE;
+    }
+    public RegressionState regressionCheck(Player p, Inventory inv) {
+        if (inv.getSize() > 9 * FileUtils.getLevel(p)) {
+            if (!regressionbool()) {
+                return RegressionState.PROTECTED;
+            }
+            return RegressionState.LOST;
+        }
+        return RegressionState.FALSE;
+    }
+
+    private PluginMode getPluginMode() {
+        String configMode = plugin.getConfig().getString("plugin_mode", "SIMPLE");
+        try {
+            return PluginMode.valueOf(configMode.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().warning("Invalid plugin_mode in config.yml. Defaulting to SIMPLE.");
+            return PluginMode.SIMPLE;
+        }
     }
 }

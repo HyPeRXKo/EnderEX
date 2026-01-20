@@ -1,16 +1,19 @@
 configversion: 2
 
+#Max backups of the chests
+max_backups: 25
+
 #Plugin mode: simple or advanced
 #Simple: use the simple_rows for everyone. No permission override!
 #Advanced: use the permission based system. (enderex.chest.1 to enderex.chest.6)
-plugin_mode: advanced
+plugin_mode: simple
 
 #Correct value: 1 to 6. Default: 3
 simple_rows: 3
 
 #If the player is going backward on the permission (3 to 2) or you change the simple_rows to something lower.
 #For example, it will prevent the opening of the chest to not lose the items in the third row.
-#This is checked by how many items are in the saved chest of the player.
+#This is checked by the size of the saved chest of the player compared to the new (possibly lower) one.
 lose_items_on_regressions: false
 
 #Enable or disable (true/false) the periodic save message of the cache of the chests in the console.
@@ -26,13 +29,15 @@ erase_vanilla_enderchest_on_transfer: true
 #Enable or disable (true/false) the disable of the physical enderchest switch to EnderEX.
 disable_physical_enderchest_switch_to_enderex: false
 
-#Enable the need for the permssion when a player want to open the physical enderchest. (enderex.physicalopen)
+#Enable the need for the permssion when a player want to open the physical enderchest.(Advanced mode) (enderex.physicalopen)
 need_permission_for_physical_opening: false
 
-#Enable the need for the permission when a player want to open the EnderEX chest with the command. (enderex.commandopen)
+#Enable the need for the permission when a player want to open the EnderEX chest with the command. (Advanced mode) (enderex.commandopen)
 need_permission_for_command_opening: false
 
 #Title of the chest. %level% will be replaced by the corresponding level name.
+#The prefix is only for messages to the players, not the chest titles.
+prefix: "&7[&d&lEnderEX&7]"
 title: "&d&lEnderEX | %level%"
 titleadmin: "&d&lEnderEX | %player%"
 level1: "&5Level I"
@@ -41,3 +46,39 @@ level3: "&5Level III"
 level4: "&5Level IV"
 level5: "&5Level V"
 level6: "&5Level VI"
+
+messages:
+  noPermission: "&cYou don't have the permission to execute this command."
+  noPermissionPhysical: "&cYou don't have the permission to open the physical enderchest."
+  regressionProtect: "&cYou cannot open your enderchest because you lost your previous level."
+  regressionLost: "&cYou lost some items due to your level regression."
+  transferPlayerNotOnline: "&cThe player needs to be online for that command."
+  transferSimpleNotEnough: "&cYou need to have enderchests with at least 3 rows for this command to work."
+  transferAdvancedNotEnough: "&cThis player doesn't have an enderchest big enough to transfer."
+  transferNoEnderchest: "&cThis player has no items in their enderchest."
+  transferEnderchestNotEmpty: "&cThis player already has items in their EnderEX chest."
+  transferSuccesful: "&aYou have succesfully transfered the vanilla enderchest of %player% to his EnderEX Chest."
+  chestAlreadyOpened: "&cThis chest is already open by another user."
+  enderchestSaved: "&aEnderchest saved."
+  noEnderchest: "&fYou do not have an enderchest."
+  noEnderchestFound: "&cNo Enderchest found for this user."
+  noUserWithThisIdFound: "&cNo user found with ID %id%."
+  noUserWithThisNameFound: "&cNo user found with the name \"%name%\"."
+  multipleUserWithThisNameFound: "&fMultiple accounts match \"%name%\":"
+  useIdToResolve: "&cUse the ID to resolve the ambiguity."
+  invalidPage: "&cThe page you specified is incorrect."
+  userInfoSearchId: "&fUser information for %id%:"
+  userInfoSearchName: "&fUser information for %name%:"
+  usermapList: "&fUsermap %page%/%maxpage%:"
+  userInfoEntry: "&f- &7[&d%id%&7] &f%name% &8| &r%platform% &8| &7%uuid%"
+  help:
+    - "&f----- &d&lEnderEX &r&dHelp: &f-----"
+    - "&f- &9/EnderEX &7or &9/ec&7: main command, it open your chest"
+    - "&f- &9Open &d> &7it open your chest"
+    - "&f- &9Help &d> &7You're here"
+    - "&f- &9Reload &d> &7Reload the plugin configuration"
+    - "&f- &9See &8[ID/NAME] &d> &7Open another player enderchest"
+    - "&f- &9Transfer &8[ID/NAME] &d> &7Transfer a player vanilla enderchest to the EnderEX System"
+    - "&f- &9Forcetransfer &8[ID/NAME] &d> &7Force the transfer, bypassing safety checks"
+    - "&f- &9Usermap &8[ID/NAME] &d> &7Give infos on a player account(s)"
+    - "&f- &7Admin permissions are enderex.admin & enderex.edit"

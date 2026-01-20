@@ -1,19 +1,17 @@
 name: EnderEX
 version: '${project.version}'
+softdepend: [Floodgate]
 main: fr.infinitystudios.enderex.EnderEX
 api-version: '1.21'
 authors: [ InfinityStudios ]
 website: https://vlxproject.fr
-commands:
-  EnderEX:
-    description: main command
-    usage: /<command>
-    aliases: [ex, ec, enderchest]
-  EnderEXsee:
-    description: admin command
-    usage: /<command> {player}
-    aliases: [ecsee, exsee]
 permissions:
+  enderex.physicalopen:
+    description: activate physical opening of the enderchests
+    default: false
+  enderex.commandopen:
+    description: activate command opening of the enderchests
+    default: false
   enderex.chest.1:
     description: open 1 row
     default: false
@@ -32,6 +30,9 @@ permissions:
   enderex.chest.6:
     description: open 6 row
     default: false
-  enderex.chest.admin:
+  enderex.admin:
     description: admin perm
+    default: op
+  enderex.edit:
+    description: edit other EC perm
     default: op

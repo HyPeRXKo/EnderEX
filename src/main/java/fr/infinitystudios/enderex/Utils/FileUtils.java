@@ -1,8 +1,8 @@
 package fr.infinitystudios.enderex.Utils;
 
 import fr.infinitystudios.enderex.EnderEX;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,39 +21,9 @@ public class FileUtils {
     private static final FileConfiguration userMapConfig = new YamlConfiguration();
     private static final File userMapFile = new File(plugin.getDataFolder(), "usermap.yml");
 
-    /*
-    public FileConfiguration GetChestConfig(Player p) {
-        FileConfiguration invdata;
-        File invdatafile = new File(plugin.getDataFolder() + "/data/", p.getUniqueId() + ".yml");
-        if (!invdatafile.exists()) {
-            return null;
-        }
-        invdata = new YamlConfiguration();
-        try {
-            invdata.load(invdatafile);
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-        return invdata;
+    private TextComponent cc(String text) {
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(text);
     }
-
-     */
-
-    /*
-    public void SaveChestConfig(Player p, Inventory chest) {
-        FileConfiguration invdata;
-        File invdatafile = new File(plugin.getDataFolder() + "/data/", p.getUniqueId() + ".yml");
-        if(!invdatafile.exists()) invdatafile.getParentFile().mkdirs();
-        invdata = new YamlConfiguration();
-        invdata.set("player", p.getName());
-        invdata.set("chest", chest.getContents());
-        try {
-            invdata.save(invdatafile);
-        } catch (IOException | IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-    }
-     */
 
     public Inventory loadPlayerChest(UUID uuid) {
         try {
@@ -69,18 +40,25 @@ public class FileUtils {
                 return null;
             }
 
-            // Désérialise et récupère un Inventory
-            Inventory loaded = InventorySerializer.fromBase64(base64);
+            // Deserialisation de l'inventaire (Conversion si besoin)
+            if(!cfg.contains("dataversion")){
+                cfg.set("dataversion", 2);
+                Inventory oldinv = InventorySerializer.OLDfromBase64(base64);
+                base64 = InventorySerializer.inventoryToNBTBase64(oldinv);
+                cfg.set("chest", base64);
+            }
+
+            Inventory loaded = InventorySerializer.nbtBase64ToInventory(base64);
 
             int level = getLevel(loaded.getSize());
 
             // Crée un nouvel Inventory aux bonnes dimensions/titre et copie le contenu
-            Inventory inv = Bukkit.createInventory(null, 9 * level, buildTitle(level));
+            Inventory inv = plugin.getServer().createInventory(null, 9 * level, buildTitle(level));
             inv.setContents(loaded.getContents());
             return inv;
 
         } catch (IOException | ClassNotFoundException | InvalidConfigurationException e) {
-            plugin.getLogger().severe("Error load chest for " + UsermapCache.getname(uuid) + ": " + e.getMessage());
+            plugin.getLogger().severe("Error load chest for " + uuid.toString() + ": " + e.getMessage());
             // Fallback : inventaire vide
             return null;
         }
@@ -96,34 +74,21 @@ public class FileUtils {
             File file = new File(dir, uuid + ".yml");
 
             // Sérialise l'inventaire
-            String base64 = InventorySerializer.toBase64(inventory);
+            String base64 = InventorySerializer.inventoryToNBTBase64(inventory);
 
             // Stocke dans le YML
             FileConfiguration cfg = new YamlConfiguration();
+            if(!cfg.contains("dataversion")) {
+                cfg.set("dataversion", 2);
+            }
             cfg.set("chest", base64);
             cfg.save(file);
         } catch (IOException e) {
-            plugin.getLogger().severe("Error save chest for " + UsermapCache.getname(uuid) + ": " + e.getMessage());
+            plugin.getLogger().severe("Error save chest for " + uuid.toString() + ": " + e.getMessage());
         }
     }
 
-    public void saveUserMap(Map<String, UUID> USER_MAP) {
-        if(!userMapFile.exists()) userMapFile.getParentFile().mkdirs();
-        try {
-            userMapConfig.set("usermap", null);
-            for (Map.Entry<String, UUID> entry : USER_MAP.entrySet()) {
-                userMapConfig.set("usermap." + entry.getKey(), entry.getValue().toString());
-            }
-            userMapConfig.save(userMapFile);
-            if(plugin.getConfig().getBoolean("console_save_messages")){
-                plugin.getLogger().info("UserMap saved, entries: " + USER_MAP.size());
-            }
-        } catch (IOException e) {
-            plugin.getLogger().severe("Failed to save usermap.yml: " + e.getMessage());
-        }
-    }
-
-    public void loadUserMap() {
+    public void convertUserMap() {
         if(!userMapFile.exists()) return;
         try {
             userMapConfig.load(userMapFile);
@@ -132,27 +97,50 @@ public class FileUtils {
                 for (Map.Entry<String, Object> entry : raw.entrySet()) {
                     String name = entry.getKey();
                     String uuidStr = entry.getValue().toString();
+                    UUID uuid = UUID.fromString(uuidStr);
+
+                    Platform platform = uuidStr.startsWith("00000000-0000-0000") ? Platform.BEDROCK : Platform.JAVA;
+
+                    UserEntry userEntry = null;
+
+
                     try {
-                        UsermapCache.putname(name, UUID.fromString(uuidStr));
-                    } catch (IllegalArgumentException ex) {
-                        plugin.getLogger().warning("Invalid UUID for user " + name + ": " + uuidStr);
+                       userEntry = plugin.getDatabaseManager().getUserByUUID(uuid);
+                    } catch (SQLException e) {
+                        plugin.getLogger().warning("Error accessing the database.");
+                    }
+                    
+                    if(userEntry != null){continue;}
+                    
+                    try {
+                        plugin.getDatabaseManager().insertUser(name, uuid, platform);
+                    } catch (IllegalArgumentException | SQLException ex) {
+                        plugin.getLogger().warning("Error in the conversion for user " + name + ": " + uuidStr);
                     }
                 }
             }
-            plugin.getLogger().info("UserMap loaded, entries: " + UsermapCache.usermapCACHE.size());
+            plugin.getLogger().info("Old UserMap converted to the new database system.");
+            boolean trydeleting = userMapFile.delete();
+            if(!trydeleting) {
+                plugin.getLogger().warning("Failed to delete old usermap.yml");
+            }
         } catch (IOException | InvalidConfigurationException e) {
-            plugin.getLogger().severe("Failed to load usermap.yml: " + e.getMessage());
+            plugin.getLogger().severe("Failed to convert usermap.yml: " + e.getMessage());
         }
     }
 
     /** Construit le titre en remplaçant %level% */
-    private String buildTitle(int level) {
+    private TextComponent buildTitle(int level) {
         String template = plugin.getConfig().getString("title", "EnderEx - Level %level%");
         template = template.replace("%level%", plugin.getConfig().getString("level" + level, String.valueOf(level)));
-        return ChatColor.translateAlternateColorCodes('&', template);
+        return cc(template);
     }
 
-    public Integer getLevel(Player p) {
+    public static Integer getLevel(Player p) {
+        if(getPluginMode() == PluginMode.SIMPLE){
+            return plugin.getConfig().getInt("simple_rows", 3);
+        }
+
         if (p.hasPermission("enderex.chest.6")) return 6;
         else if (p.hasPermission("enderex.chest.5")) return 5;
         else if (p.hasPermission("enderex.chest.4")) return 4;
@@ -171,5 +159,15 @@ public class FileUtils {
             case 54 -> 6;
             default -> 0;
         };
+    }
+
+    public static PluginMode getPluginMode() {
+        String configMode = plugin.getConfig().getString("plugin_mode", "SIMPLE");
+        try {
+            return PluginMode.valueOf(configMode.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().warning("Invalid plugin_mode in config.yml. Defaulting to SIMPLE.");
+            return PluginMode.SIMPLE;
+        }
     }
 }

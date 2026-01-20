@@ -4,6 +4,7 @@ import fr.infinitystudios.enderex.EnderEX;
 import fr.infinitystudios.enderex.Utils.FileUtils;
 import org.bukkit.inventory.Inventory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public class EnderCache {
 
     private static EnderEX plugin = EnderEX.getPlugin();
 
-    private static final Map<UUID, Inventory> CACHE = new java.util.HashMap<>();
+    private static final Map<UUID, Inventory> CACHE = new HashMap<>();
 
     public static boolean contains(UUID uuid) {
         return CACHE.containsKey(uuid);

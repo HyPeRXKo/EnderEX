@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UsermapCache {
 
+    /*
+
     private static final EnderEX plugin = EnderEX.getPlugin();
 
     public static final Map<String, UUID> usermapCACHE = new ConcurrentHashMap<>();
@@ -51,4 +53,6 @@ public class UsermapCache {
             uuidmapCACHE.put(entry.getValue(), entry.getKey());
         }
     }
+
+     */
 }
