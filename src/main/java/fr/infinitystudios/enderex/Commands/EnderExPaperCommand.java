@@ -132,7 +132,8 @@ public class EnderExPaperCommand {
     //EnderEx see [ID/NAME]
     //EnderEx transfer [ID/NAME]
     //EnderEx forcetransfer [ID/NAME]
-    //EnderEx usermap [ID/NAME]
+    //EnderEx usermap search [ID/NAME]
+    //EnderEx usermap list [PAGE]
 
     private static Boolean chestCommandOpenBool = plugin.getConfig().getBoolean("need_permission_for_command_opening");
 

@@ -80,5 +80,6 @@ messages:
     - "&f- &9See &8[ID/NAME] &d> &7Open another player enderchest"
     - "&f- &9Transfer &8[ID/NAME] &d> &7Transfer a player vanilla enderchest to the EnderEX System"
     - "&f- &9Forcetransfer &8[ID/NAME] &d> &7Force the transfer, bypassing safety checks"
-    - "&f- &9Usermap &8[ID/NAME] &d> &7Give infos on a player account(s)"
+    - "&f- &9Usermap search &8[ID/NAME] &d> &7Give infos on a player account(s)"
+    - "&f- &9Usermap list &8[NUMBER] &d> &7Give a list of users in the usermap"
     - "&f- &7Admin permissions are enderex.admin & enderex.edit"

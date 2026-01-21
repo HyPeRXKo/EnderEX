@@ -55,7 +55,7 @@ public class InvUtils {
             return null;
         }
 
-        if(regressionState == RegressionState.LOST){
+        if(regressionState == RegressionState.LOST || regressionState == RegressionState.DOWNSIZED){
             for(int i = 0; i < 9*level; i++){
                 clone.setItem(i, inv.getItem(i));
             }
@@ -231,26 +231,35 @@ public class InvUtils {
     public RegressionState regressionCheck(Player p){
         if(EnderCache.contains(p.getUniqueId())) {
             Inventory inv = EnderCache.get(p.getUniqueId());
-            if(inv.getSize() > 9*FileUtils.getLevel(p)){
-                MessagesUtils mu = new MessagesUtils();
-                if(!regressionbool()){
-                    mu.RegressionProtected(p);
-                    return RegressionState.PROTECTED;
-                }
-                mu.RegressionLost(p);
-                return RegressionState.LOST;
+            RegressionState regressionState = regressionCheck(p, inv);
+            if(regressionState == RegressionState.PROTECTED){
+                new MessagesUtils().RegressionProtected(p);
+            } else if(regressionState == RegressionState.LOST){
+                new MessagesUtils().RegressionLost(p);
             }
+            return regressionState;
         }
         return RegressionState.FALSE;
     }
+
     public RegressionState regressionCheck(Player p, Inventory inv) {
-        if (inv.getSize() > 9 * FileUtils.getLevel(p)) {
-            if (!regressionbool()) {
-                return RegressionState.PROTECTED;
-            }
-            return RegressionState.LOST;
+        int maxSlots = 9 * FileUtils.getLevel(p);
+
+        if (inv.getSize() <= maxSlots) {
+            return RegressionState.FALSE;
         }
-        return RegressionState.FALSE;
+
+        for (int i = maxSlots; i < inv.getSize(); i++) {
+            ItemStack item = inv.getItem(i);
+
+            if (item != null && !item.getType().isAir()) {
+                return regressionbool()
+                        ? RegressionState.LOST
+                        : RegressionState.PROTECTED;
+            }
+        }
+
+        return RegressionState.DOWNSIZED;
     }
 
     private PluginMode getPluginMode() {
