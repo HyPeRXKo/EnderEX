@@ -413,7 +413,7 @@ public class EnderExPaperCommand {
 
         if (online != null && usermapSearch == false) {
 
-            Platform platform = plugin.getFloodgateApi() == null ? Platform.JAVA : plugin.getFloodgateApi().isFloodgatePlayer(online.getUniqueId()) ? Platform.BEDROCK : Platform.JAVA;
+            Platform platform = plugin.playerPlatformResolver(online.getUniqueId());
 
             return new ResolvedUser(
                     -1,

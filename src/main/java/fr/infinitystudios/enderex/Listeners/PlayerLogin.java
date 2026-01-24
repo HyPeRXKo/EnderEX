@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
+import org.geysermc.floodgate.api.FloodgateApi;
 
 import java.sql.SQLException;
 import java.util.UUID;
@@ -28,7 +29,8 @@ public class PlayerLogin implements Listener {
 
         UUID uuid = p.getUniqueId();
         String name = p.getName();
-        Platform platform = plugin.getFloodgateApi() == null ? Platform.JAVA : plugin.getFloodgateApi().isFloodgatePlayer(uuid) ? Platform.BEDROCK : Platform.JAVA;
+
+        Platform platform = plugin.playerPlatformResolver(uuid);
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {

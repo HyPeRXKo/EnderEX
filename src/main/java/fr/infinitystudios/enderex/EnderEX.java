@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 
 public final class EnderEX extends JavaPlugin {
@@ -132,6 +133,18 @@ public final class EnderEX extends JavaPlugin {
                 plugin.getLogger().severe(e.getMessage());
             }
         },delay, period);
+    }
+
+    public Platform playerPlatformResolver(UUID uuid){
+        if (floodgateApi == null) {
+            return Platform.JAVA;
+        } else if (!floodgateApi.isFloodgatePlayer(uuid)) {
+            return Platform.JAVA;
+        } else if (floodgateApi.getPlayer(uuid).isLinked()) {
+            return Platform.JAVA;
+        } else {
+            return Platform.BEDROCK;
+        }
     }
 
 }
