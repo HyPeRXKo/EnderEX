@@ -7,11 +7,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
-import org.geysermc.floodgate.api.FloodgateApi;
 
 import java.sql.SQLException;
 import java.util.UUID;
@@ -23,7 +22,7 @@ public class PlayerLogin implements Listener {
     private EnderEX plugin = EnderEX.getPlugin();
 
     @EventHandler
-    private void onPlayerLogin(PlayerLoginEvent e) {
+    private void onPlayerLogin(PlayerJoinEvent e) {
 
         Player p = e.getPlayer();
 
@@ -38,6 +37,11 @@ public class PlayerLogin implements Listener {
                 UserEntry entry = db.getUserByUUID(uuid);
                 if (entry == null) {
                     db.insertUser(name, uuid, platform);
+                }
+                else {
+                    if(entry.uuid().equals(uuid) && entry.platform().equals(platform)) {
+                        db.updateName(entry.id(), name);
+                    }
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();

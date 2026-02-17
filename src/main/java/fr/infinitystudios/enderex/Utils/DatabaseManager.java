@@ -91,6 +91,16 @@ public class DatabaseManager {
         }
     }
 
+    public void updateName(int id, String name) throws SQLException {
+        String sql = "UPDATE users SET name = ? WHERE id = ?";
+
+        try(PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setString(1, name);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        }
+    }
+
     public List<UserEntry> getUsersByName(String name) throws SQLException {
         String sql = "SELECT * FROM users WHERE name = ? COLLATE NOCASE;";
         List<UserEntry> results = new ArrayList<>();
